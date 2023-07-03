@@ -59,7 +59,8 @@ class Plane extends BBoxedPrimitive {
       @Override
       public Vec2 getUV() {
         // yahan calculate kro appropriate and create kro approprite coordinates
-        return new Vec2(0, 0);
+        Point p = getPoint();
+        return new Vec2(p.x(), p.z());
       }
 
       @Override
