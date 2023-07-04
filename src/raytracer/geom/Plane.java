@@ -15,9 +15,9 @@ class Plane extends BBoxedPrimitive {
   private final Vec3 n;
 
   public Plane(final Point m, final Vec3 n) {
-    super(BBox.create(m, m)); //yahan par bpunding box banayenge but the thing is k ye infinite honge to to tutor se confirm krna hai case
+    super(BBox.create(m, m)); // Adjust as per the tutor's instruction for infinite planes
     this.m = m;
-    this.n = n;
+    this.n = n.normalized(); // Normalize the normal vector here
   }
 
   @Override
@@ -45,27 +45,31 @@ class Plane extends BBoxedPrimitive {
       @Override
       protected boolean calculateHit() {
         final Vec3 dir = ray.dir();
+        final Vec3 v = m.sub(ray.base()); // Vector from the base of the ray to the point on the plane
         final float denom = dir.dot(n);
 
+        // If the denominator is 0: ray and plane are parallel, so there's no intersection
         if (Constants.isZero(denom)) return false;
 
-        t = (m.sub(ray.base()).dot(n)) / denom;
+        t = v.dot(n) / denom;
 
+        // If λ (t here) < 0 the hit point is before the starting point of the ray, and thus invalid
+        if (t < 0) return false;
+
+        // λ should also be within the range [tmin, tmax]
         if (t < tmin || t > tmax) return false;
 
-        return t >= Constants.EPS;
+        return true;
       }
 
       @Override
       public Vec2 getUV() {
-        // yahan calculate kro appropriate and create kro approprite coordinates
-        Point p = getPoint();
-        return new Vec2(p.x(), p.z());
+        return Util.computePlaneUV(n, m, getPoint());
       }
 
       @Override
       public Vec3 getNormal() {
-        return n;
+        return n; // As it's already normalized in the constructor, directly return it here
       }
     };
   }

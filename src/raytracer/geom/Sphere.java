@@ -60,23 +60,16 @@ class Sphere extends BBoxedPrimitive {
         }
       }
 
-      @Override
-      public Vec2 getUV() {
-        Vec3 p = getPoint().sub(c); // hit point relative to the sphere center
-        double phi = Math.atan2(p.z(), p.x());
-        double theta = Math.asin(p.y() / r);
-        Vec2 uv = new Vec2(
-          (float) (1.0 - (phi + Math.PI) / (2.0 * Math.PI)),
-          (float) ((theta + Math.PI / 2.0) / Math.PI)
-        );
-        return uv;
-      }
-
       //   @Override
       //   public Vec2 getUV() {
       //     // yahan calculate kro appropriate and create kro approprite coordinates
       //     return new Vec2(0, 0);
       //   }
+      @Override
+      public Vec2 getUV() {
+        Vec3 radial = this.getPoint().sub(c).normalized(); // radial vector from sphere's center
+        return Util.computeSphereUV(radial);
+      }
 
       @Override
       public Vec3 getNormal() {

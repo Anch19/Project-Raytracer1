@@ -22,7 +22,9 @@ public class MyCheckerboard implements Shader {
   public Color shade(Hit hit, Trace trace) {
     // Get the texture coordinates from the hit
     Vec2 uv = hit.getUV();
-    int x = (int) (Math.floor(uv.x() / s) + Math.floor(uv.y() / s));
+    System.out.println("UV: " + uv); // For debugging
+
+    int x = (int) ((Math.floor(uv.x() / s)) + (Math.floor(uv.y() / s)));
 
     // Determine which shader to use based on the checkerboard pattern
     if (x % 2 == 0) {

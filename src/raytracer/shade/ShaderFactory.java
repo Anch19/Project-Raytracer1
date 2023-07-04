@@ -2,6 +2,7 @@ package raytracer.shade;
 
 import raytracer.core.Shader;
 import raytracer.math.Color;
+import raytracer.math.Constants;
 
 public final class ShaderFactory {
 
@@ -41,7 +42,12 @@ public final class ShaderFactory {
     if (scale <= 0) {
       throw new IllegalArgumentException("Scale must be greater than zero.");
     }
-
+    if (Float.isInfinite(scale)) {
+      throw new IllegalArgumentException("Scale must be greater than zero.");
+    }
+    if (Constants.isZero(scale)) {
+      throw new IllegalArgumentException("Scale must be greater than zero.");
+    }
     return new MyCheckerboard(a, b, scale);
   }
 
