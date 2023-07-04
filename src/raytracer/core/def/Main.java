@@ -83,7 +83,7 @@ public class Main {
     final boolean implementedSphere = true; // TODO implement Sphere
     final boolean implementedPhong = true; // TODO implement Phong
     final boolean implementedOBJReader = true; // TODO implement OBJReader
-    final boolean implementedBVH = false; // TODO implement BVH
+    final boolean implementedBVH = true; // TODO implement BVH
     final LightSource ls = new PointLightSource(
       new Point(-10, 10, -10),
       Color.WHITE
