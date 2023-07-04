@@ -54,7 +54,6 @@ public class BVH extends BVHBase {
       return;
     }
 
-    // calculate bounding box
     BBox box = objects[start].bbox();
     for (int i = start + 1; i < end; i++) {
       box = BBox.surround(box, objects[i].bbox());
@@ -121,10 +120,20 @@ public class BVH extends BVHBase {
     final int splitDim,
     final float splitPos
   ) {
-    // TODO Implement this method
-    throw new UnsupportedOperationException(
-      "This method has not yet been implemented."
-    );
+    for (Obj obj : objects) {
+      Point minPoint = obj.bbox().getMin();
+      Point maxPoint = obj.bbox().getMax();
+
+      float centerValue = (minPoint.get(splitDim) + maxPoint.get(splitDim)) / 2;
+
+      if (centerValue < splitPos) {
+        a.add(obj);
+      } else {
+        b.add(obj);
+      }
+    }
+
+    objects.clear();
   }
 
   @Override
@@ -134,7 +143,7 @@ public class BVH extends BVHBase {
     final float tMin,
     final float tMax
   ) {
-    // Check intersection with bounding box
+    //yahan par intersection bounding box k saath check hota hai
     if (!intersect(ray, boundingBox, tMin, tMax)) {
       return Hit.No.get();
     }

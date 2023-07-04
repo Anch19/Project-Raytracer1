@@ -13,11 +13,20 @@ class Plane extends BBoxedPrimitive {
 
   private final Point m;
   private final Vec3 n;
+  private final float d;
 
   public Plane(final Point m, final Vec3 n) {
     super(BBox.create(m, m)); // Adjust as per the tutor's instruction for infinite planes
     this.m = m;
     this.n = n.normalized(); // Normalize the normal vector here
+    this.d = m.dot(this.n); // Calculate the distance from the plane to the origin
+  }
+
+  public Plane(final Point a, final Point b, final Point c) {
+    super(BBox.INF);
+    this.m = a; // You can choose any point as the reference point 'm'
+    this.n = b.sub(a).cross(c.sub(a)).normalized();
+    this.d = m.dot(this.n);
   }
 
   @Override
@@ -44,20 +53,21 @@ class Plane extends BBoxedPrimitive {
 
       @Override
       protected boolean calculateHit() {
-        final Vec3 dir = ray.dir();
-        final Vec3 v = m.sub(ray.base()); // Vector from the base of the ray to the point on the plane
-        final float denom = dir.dot(n);
+        Vec3 dir = ray.dir();
+        float numerator = d - ray.base().dot(n);
+        float denominator = dir.dot(n);
 
-        // If the denominator is 0: ray and plane are parallel, so there's no intersection
-        if (Constants.isZero(denom)) return false;
+        if (denominator == 0) {
+          // Ray and plane are parallel, no intersection
+          return false;
+        }
 
-        t = v.dot(n) / denom;
+        t = numerator / denominator;
 
-        // If λ (t here) < 0 the hit point is before the starting point of the ray, and thus invalid
-        if (t < 0) return false;
-
-        // λ should also be within the range [tmin, tmax]
-        if (t < tmin || t > tmax) return false;
+        if (t < tmin || t > tmax) {
+          // Intersection point is outside the allowed hit distance range
+          return false;
+        }
 
         return true;
       }
