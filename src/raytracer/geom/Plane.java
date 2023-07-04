@@ -3,42 +3,43 @@ package raytracer.geom;
 import raytracer.core.Hit;
 import raytracer.core.Obj;
 import raytracer.core.def.LazyHitTest;
-import raytracer.math.Constants;
-import raytracer.math.Point;
-import raytracer.math.Ray;
-import raytracer.math.Vec2;
-import raytracer.math.Vec3;
+import raytracer.math.*;
 
-class Plane extends BBoxedPrimitive {
+public class Plane extends BBoxedPrimitive {
 
-  private final Point m;
-  private final Vec3 n;
-  private final float d;
-
-  public Plane(final Point m, final Vec3 n) {
-    super(BBox.create(m, m)); // Adjust as per the tutor's instruction for infinite planes
-    this.m = m;
-    this.n = n.normalized(); // Normalize the normal vector here
-    this.d = m.dot(this.n); // Calculate the distance from the plane to the origin
-  }
+  private final Point mypoint;
+  private final Vec3 newvector;
 
   public Plane(final Point a, final Point b, final Point c) {
-    super(BBox.INF);
-    this.m = a; // You can choose any point as the reference point 'm'
-    this.n = b.sub(a).cross(c.sub(a)).normalized();
-    this.d = m.dot(this.n);
+    this.mypoint = a;
+    Vec3 Mya = b.sub(a);
+    Vec3 Myb = c.sub(a);
+    this.newvector = Mya.cross(Myb).normalized();
+  }
+
+  public Plane(final Point a, final Vec3 u) {
+    this.mypoint = a;
+    this.newvector = u.normalized();
   }
 
   @Override
-  public Hit hitTest(
-    final Ray ray,
-    final Obj obj,
-    final float tmin,
-    final float tmax
-  ) {
+  public Hit hitTest(Ray ray, Obj obj, float tmin, float tmax) {
     return new LazyHitTest(obj) {
       private Point point = null;
       private float t;
+
+      @Override
+      protected boolean calculateHit() {
+        final Vec3 dir = ray.dir().normalized();
+        final float det = dir.dot(newvector);
+
+        if (Constants.isZero(det)) {
+          return false;
+        }
+
+        t = mypoint.sub(ray.base()).dot(newvector) / det;
+        return !(t < tmin) && !(t > tmax);
+      }
 
       @Override
       public float getParameter() {
@@ -47,69 +48,34 @@ class Plane extends BBoxedPrimitive {
 
       @Override
       public Point getPoint() {
-        if (point == null) point = ray.eval(t).add(n.scale(Constants.EPS));
+        if (point == null) point = ray.eval(t).add(newvector.scale(0.0001f));
         return point;
       }
 
       @Override
-      protected boolean calculateHit() {
-        Vec3 dir = ray.dir();
-        float numerator = d - ray.base().dot(n);
-        float denominator = dir.dot(n);
-
-        if (denominator == 0) {
-          // Ray and plane are parallel, no intersection
-          return false;
-        }
-
-        t = numerator / denominator;
-
-        if (t < tmin || t > tmax) {
-          // Intersection point is outside the allowed hit distance range
-          return false;
-        }
-
-        return true;
+      public Vec3 getNormal() {
+        return newvector;
       }
 
       @Override
       public Vec2 getUV() {
-        return Util.computePlaneUV(n, m, getPoint());
-      }
-
-      @Override
-      public Vec3 getNormal() {
-        return n; // As it's already normalized in the constructor, directly return it here
+        return Util.computePlaneUV(newvector, mypoint, getPoint());
       }
     };
   }
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((m == null) ? 0 : m.hashCode());
-    result = prime * result + ((n == null) ? 0 : n.hashCode());
-    return result;
+    return mypoint.hashCode() ^ newvector.hashCode();
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    Plane other = (Plane) obj;
-    if (m == null) {
-      if (other.m != null) return false;
-    } else if (!m.equals(other.m)) return false;
-    if (n == null) {
-      if (other.n != null) return false;
-    } else if (!n.equals(other.n)) return false;
-    return true;
-  }
-
-  @Override
-  public String toString() {
-    return "Plane [m=" + m + ", n=" + n + "]";
+  public boolean equals(Object other) {
+    if (other instanceof Plane) {
+      Plane p = (Plane) other;
+      return mypoint.equals(p.mypoint) && newvector.equals(p.newvector);
+    }
+    return false;
   }
 }
+//i was having some problem in the constructor , so THAT HAS BEEN DONE WITH THE HELP OF CHATGPT

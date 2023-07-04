@@ -39,10 +39,10 @@ public final class ShaderFactory {
       throw new IllegalArgumentException("Shaders cannot be null.");
     }
 
-    if (scale <= 0) {
+    if (scale < 0) {
       throw new IllegalArgumentException("Scale must be greater than zero.");
     }
-    if (Float.isInfinite(scale)) {
+    if (Float.isInfinite(scale) || Float.isNaN(scale)) {
       throw new IllegalArgumentException("Scale must be greater than zero.");
     }
     if (Constants.isZero(scale)) {
