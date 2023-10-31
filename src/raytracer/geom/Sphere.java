@@ -9,6 +9,7 @@ import raytracer.math.Ray;
 import raytracer.math.Vec2;
 import raytracer.math.Vec3;
 
+//this is a comment
 class Sphere extends BBoxedPrimitive {
 
   private final Point c;
