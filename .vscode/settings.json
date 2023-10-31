@@ -1,8 +1,5 @@
 {
-    "cSpell.words": [
-        "bbox",
-        "Phong",
-        "raytracer"
-    ],
-    "editor.formatOnSave": true
+  "cSpell.words": ["bbox", "Phong", "raytracer"],
+  "editor.formatOnSave": true,
+  "github-enterprise.uri": "https://git.prog2.de"
 }
